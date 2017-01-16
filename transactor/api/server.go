@@ -22,8 +22,12 @@ func Start(engine *transactor.Connection) error {
 
 	listen := fmt.Sprintf("%s:%s", bind, port)
 
-	log.Println("*********************************")
-	log.Println("* Datagol Transactor starting")
+	fmt.Fprintln(os.Stderr, "*********************************")
+	fmt.Fprintln(os.Stderr, "* Datagol Transactor starting")
+	fmt.Fprintln(os.Stderr, "*")
+	fmt.Fprintf(os.Stderr, "* Listening on %s\n", listen)
+	fmt.Fprintln(os.Stderr, "* Cltr-C to hang up")
+	fmt.Fprintln(os.Stderr, "")
 	log.Printf("Listening on %s\n", listen)
 
 	err = http.ListenAndServe(listen, router)

@@ -53,7 +53,7 @@ func (transactor *Connection) insert(entityID uint64, attributeValues AttributeV
 			parameterIndex + 1,
 		)
 
-		params = append(params, attribute, string(value))
+		params = append(params, attribute, string(value)	)
 
 		parameterIndex = parameterIndex + 2
 	}
