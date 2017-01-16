@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-dropdb datagol 2> /dev/null || true
-createuser datagol 2> /dev/null || true
-createdb datagol 2> /dev/null || true
-psql -c "grant all on database datagol to datagol"
+
+if [ "$1" == "drop" ]; then
+
+    dropdb datagol 2> /dev/null || true
+    createuser datagol 2> /dev/null || true
+    createdb datagol 2> /dev/null || true
+    psql -c "grant all on database datagol to datagol"
+else
+    psql datagol -c "truncate table eavt;"
+fi

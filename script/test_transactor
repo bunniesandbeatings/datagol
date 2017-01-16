@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+curl \
+  -H "Content-Type: application/json" \
+  -X POST \
+  --data-binary "@script/fixtures/assert.json" \
+ http://localhost:3000/entities
+
+psql datagol -c "select * from eavt;"
