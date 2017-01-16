@@ -1,7 +1,7 @@
 # Setup
 ```
-$ createdb datagol
-$ creatuser datagol
+createdb datagol
+creatuser datagol
 psql -c "grant all on database datagol to datagol"
 ```
 

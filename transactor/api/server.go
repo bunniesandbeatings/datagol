@@ -4,6 +4,9 @@ import (
 	"github.com/tedsuo/rata"
 	"net/http"
 	"github.com/bunniesandbeatings/datagol/transactor"
+	"os"
+	"fmt"
+	"log"
 )
 
 func Start(engine *transactor.Connection) error {
@@ -12,7 +15,18 @@ func Start(engine *transactor.Connection) error {
 		return err
 	}
 
-	err = http.ListenAndServe(":8000", router)
+	port := os.Getenv("PORT")
+	if port == "" { port = "3000"}
+
+	bind := os.Getenv("BIND")
+
+	listen := fmt.Sprintf("%s:%s", bind, port)
+
+	log.Println("*********************************")
+	log.Println("* Datagol Transactor starting")
+	log.Printf("Listening on %s\n", listen)
+
+	err = http.ListenAndServe(listen, router)
 	if err != nil {
 		return err
 	}

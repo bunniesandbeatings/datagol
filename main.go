@@ -11,7 +11,7 @@ import (
 
 func main() {
 	log.SetOutput(os.Stderr)
-
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	connection, err := transactor.NewConnection("user=datagol dbname=datagol sslmode=disable")
 
 	if err != nil {

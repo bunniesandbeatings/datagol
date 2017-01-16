@@ -5,6 +5,8 @@ import (
 	"github.com/bunniesandbeatings/datagol/transactor"
 	"encoding/json"
 	"io/ioutil"
+	"log"
+	"fmt"
 )
 
 type AssertHandler struct {
@@ -17,13 +19,12 @@ func NewAssertHandler(connection *transactor.Connection) *AssertHandler {
 	}
 }
 
-type Entities []Entity
-
+type AssertEntities []transactor.AttributeValuesJson
 
 func (handler *AssertHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	defer request.Body.Close()
 
-	var entities = Entities{}
+	var entities = AssertEntities{}
 
 	requestBody, err := ioutil.ReadAll(request.Body)
 	if err != nil {
@@ -33,7 +34,19 @@ func (handler *AssertHandler) ServeHTTP(writer http.ResponseWriter, request *htt
 
 	json.Unmarshal(requestBody, &entities)
 
-	for i, entity := range entities {
-		handler.Connection.CreateEntity(entity)
+	result := ""
+
+	for _, entity := range entities {
+
+		entityId, err := handler.Connection.CreateEntity(entity)
+		if err != nil {
+			log.Println(err)
+			http.Error(writer, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		result = result + fmt.Sprintf("Created Entity: %d\n", entityId)
 	}
+
+	fmt.Fprint(writer, result)
 }
