@@ -1,24 +1,34 @@
 # Setup
 ```
-createdb datagol
-creatuser datagol
-psql -c "grant all on database datagol to datagol"
+./script/resetdb
 ```
 
-# transactor.Connection
+# transactor
 
-Writes updates to the underlying db
-Only one should run
+Writes transactions to the db
+
+Currently only 'assert' works.
+
+## trying it.
+
+In one shell run
+
+```
+./script/trampoline server
+```
+
+And in another
+ 
+```
+./script/test_transactor
+```
 
 ## Todo
 
+* Accumulate support in API
 * Ensure only one Connection running
 * Broadcast updates
-* Actual http api (underway)
-* Configure db, creds, port and interface bindings from command line
-* move to transact subcommand
 
 ## Could do
 
 * authorization
-* user activity logging
