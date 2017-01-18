@@ -6,4 +6,4 @@ curl \
   --data-binary "@script/fixtures/assert.json" \
  http://localhost:3000/entities
 
-psql datagol -c "select * from eavt;"
+psql datagol -c "select * from eavt;" | tail

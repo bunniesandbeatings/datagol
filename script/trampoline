@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-gin -i run github.com/bunniesandbeatings/datagol
-

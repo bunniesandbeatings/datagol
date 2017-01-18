@@ -1,26 +1,43 @@
 package main
 
 import (
-	_ "github.com/lib/pq"
+	"fmt"
 	"log"
 	"os"
-	"github.com/bunniesandbeatings/datagol/transactor/api"
-	"github.com/bunniesandbeatings/datagol/transactor"
+
+	"github.com/jessevdk/go-flags"
+	_ "github.com/lib/pq"
 )
 
+type Options struct {
+	LogTarget string `long:"log-file" description:"Where to log to. Defaults to stderr" env:"TRANSACTOR_LOG"`
+}
+
+var globalOptions Options
+
+var parser = flags.NewParser(&globalOptions, flags.Default)
 
 func main() {
-	log.SetOutput(os.Stderr)
+	if _, err := parser.Parse(); err != nil {
+		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
+			os.Exit(0)
+		} else {
+			log.Printf("Exited with error: %s", err)
+			os.Exit(1)
+		}
+	}
+}
+
+func ConfigureLogging() {
+	if globalOptions.LogTarget == "" {
+		log.SetOutput(os.Stderr)
+	} else {
+		logFile, err := os.Open(globalOptions.LogTarget)
+		if err != nil {
+			panic(fmt.Sprintf("Cannot open log target '%s' for append.", globalOptions.LogTarget))
+		}
+		defer logFile.Close()
+		log.SetOutput(logFile)
+	}
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
-	connection, err := transactor.NewConnection("user=datagol dbname=datagol sslmode=disable")
-
-	if err != nil {
-		log.Fatal("Error: Could not build a connection: ", err)
-	}
-
-	err = api.Start(connection)
-	if err != nil {
-		log.Fatal("API Server exited: ", err)
-	}
-
 }
