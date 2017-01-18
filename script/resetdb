@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-
 if [ "$1" == "drop" ]; then
-
     dropdb datagol 2> /dev/null || true
     createuser datagol 2> /dev/null || true
     createdb datagol 2> /dev/null || true
