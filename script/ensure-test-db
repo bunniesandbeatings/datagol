@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+
+psql -c "DROP DATABASE IF EXISTS datagol_test"
+psql -c "DROP USER IF EXISTS datagol_test"
+createuser -d datagol_test
+createdb -E utf8 -e -w -O datagol_test datagol_test

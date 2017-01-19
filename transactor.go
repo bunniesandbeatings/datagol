@@ -5,11 +5,12 @@ import (
 	"github.com/bunniesandbeatings/datagol/transactor"
 	"log"
 	"github.com/bunniesandbeatings/datagol/transactor/api"
+	"fmt"
 )
 
 type APIOptions struct {
-	Host string `short:"h" long:"host" description:"interface to bind to" env:"HOST" default:"0.0.0.0"`
-	Port string `short:"p" long:"port" description:"port to bind to" env:"PORT" default:"3000"`
+	Address string `short:"a" long:"address" description:"interface to bind to" env:"ADDRESS" default:"0.0.0.0"`
+	Port    string `short:"p" long:"port" description:"port to bind to" env:"PORT" default:"3000"`
 }
 
 type DBOptions struct {
@@ -32,7 +33,11 @@ func (transactorOptions *TransactorOptions) Execute(args []string) error {
 		return err
 	}
 
-	err = api.Start(connection)
+	address := fmt.Sprintf("%s:%s", transactorOptions.API.Address, transactorOptions.API.Port)
+
+	server := api.ServerConfig{ Address: address }
+
+	err = server.Start(connection)
 	if err != nil {
 		log.Printf("Server terminated with: %s", err)
 		return nil

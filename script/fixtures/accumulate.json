@@ -1,0 +1,16 @@
+{
+  ((a)): {
+    "testing/integers": 1,
+    "vulnerability/cve/id": "CVE-1111-1111",
+    "vulnerability/cvss/base/score": 4.7,
+    "vulnerability/cvss/base/severity": "medium",
+    "vulnerability/cvss/base/vector-string": "CVSS:3.0/AV:A/AC:H/PR:L/UI:R/S:U/C:H/I:N/A:N"
+  },
+  ((b)): {
+    "vulnerability/usn": "USN-1111-1111",
+    "vulnerability/cves": [
+      "CVE-1111-1111",
+      "CVE-1111-1112"
+    ]
+  }
+}

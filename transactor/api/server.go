@@ -9,28 +9,25 @@ import (
 	"log"
 )
 
-func Start(engine *transactor.Connection) error {
+type ServerConfig struct {
+	Address string
+}
+
+func (serverConfig *ServerConfig) Start(engine *transactor.Connection) error {
 	router, err := rata.NewRouter(Routes, NewHandlers(engine))
 	if err != nil {
 		return err
 	}
 
-	port := os.Getenv("PORT")
-	if port == "" { port = "3000"}
-
-	bind := os.Getenv("BIND")
-
-	listen := fmt.Sprintf("%s:%s", bind, port)
-
 	fmt.Fprintln(os.Stderr, "*********************************")
 	fmt.Fprintln(os.Stderr, "* Datagol Transactor starting")
 	fmt.Fprintln(os.Stderr, "*")
-	fmt.Fprintf(os.Stderr, "* Listening on %s\n", listen)
+	fmt.Fprintf(os.Stderr, "* Listening on %s\n", serverConfig.Address)
 	fmt.Fprintln(os.Stderr, "* Cltr-C to hang up")
 	fmt.Fprintln(os.Stderr, "")
-	log.Printf("Listening on %s\n", listen)
+	log.Printf("Listening on %s\n", serverConfig.Address)
 
-	err = http.ListenAndServe(listen, router)
+	err = http.ListenAndServe(serverConfig.Address, router)
 	if err != nil {
 		return err
 	}

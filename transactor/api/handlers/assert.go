@@ -44,9 +44,9 @@ func (handler *AssertHandler) ServeHTTP(writer http.ResponseWriter, request *htt
 			http.Error(writer, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
 		result = result + fmt.Sprintf("Created Entity: %d\n", entityId)
 	}
 
+	writer.WriteHeader(http.StatusCreated)
 	fmt.Fprint(writer, result)
 }

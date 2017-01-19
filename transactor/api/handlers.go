@@ -6,10 +6,10 @@ import (
 	"github.com/bunniesandbeatings/datagol/transactor"
 )
 
-func NewHandlers(engine *transactor.Connection) rata.Handlers {
+func NewHandlers(connection *transactor.Connection) rata.Handlers {
 	return rata.Handlers{
-		//Accumulate: newAccumulateHandler(),
-		Assert: handlers.NewAssertHandler(engine),
+		Accumulate: handlers.NewAccumulateHandler(connection),
+		Assert: handlers.NewAssertHandler(connection),
 		Docs: handlers.NewDocsHandler(),
 	}
 }
