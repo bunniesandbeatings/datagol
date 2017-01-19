@@ -8,10 +8,11 @@ import (
 	. "os/exec"
 	. "github.com/MakeNowJust/heredoc/dot"
 	"regexp"
-	"net/http"
-	"fmt"
-	"bytes"
 	"io/ioutil"
+	"net/http"
+	"bytes"
+	"fmt"
+	"database/sql"
 )
 
 var _ = Describe("Transactor", func() {
@@ -25,14 +26,14 @@ var _ = Describe("Transactor", func() {
 	)
 
 	BeforeEach(func() {
-		CleanTestDB()
+		ResetTestDB()
 
 		transactor = Command(
 			datagolCLI,
 			"start-transactor",
 			"-a", host,
 			"-p", port,
-			"-d", "user=datagol_test dbname=datagol_test sslmode=disable",
+			"-d", testDatasourceName,
 		)
 
 		var err error
@@ -43,12 +44,15 @@ var _ = Describe("Transactor", func() {
 
 	AfterEach(func() {
 		session.Interrupt()
-		//Eventually(session.Out).Should(Say(`Got signal`))
 		Eventually(session).Should(Exit())
+		Expect(testDB).NotTo(BeNil())
+		err := testDB.Close()
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	Describe("Assert with lots of entities and attributes", func() {
 		// todo db connection fails
+		var response *http.Response
 		var postData = D(`[
 		  {
 				"testing/integers": 1,
@@ -63,19 +67,54 @@ var _ = Describe("Transactor", func() {
 			}
 		]`)
 
-		It("Responds like a rest endpoint should", func() {
-			response, err := http.Post(entitiesEndpoint, "application/json", bytes.NewBufferString(postData))
+		BeforeEach(func() {
+			var err error
+			response, err = http.Post(entitiesEndpoint, "application/json", bytes.NewBufferString(postData))
 			Expect(err).To(BeNil())
+		})
+
+		It("Responds like a rest endpoint should", func() {
 
 			Expect(response.StatusCode).To(Equal(201))
 
 			byteResponse, _ := ioutil.ReadAll(response.Body)
 			stringResponse := string(byteResponse)
 			Expect(stringResponse).To(ContainSubstring(`Created Entity: 1`))
+			Expect(stringResponse).To(ContainSubstring(`Created Entity: 2`))
 
 		})
 
 		It("creates the correct records in the DB", func() {
+			var (
+				count     int
+				row       *sql.Row
+				err       error
+				jsonValue string
+			)
+
+
+			row = testDB.QueryRow("SELECT count(DISTINCT time) FROM eavt;")
+			err = row.Scan(&count)
+			Expect(err).To(BeNil())
+			Expect(count).To(Equal(2))
+
+
+			row = testDB.QueryRow("SELECT count(DISTINCT entity) FROM eavt;")
+			err = row.Scan(&count)
+			Expect(err).To(BeNil())
+			Expect(count).To(Equal(2))
+
+			row = testDB.QueryRow("SELECT json_value FROM eavt where attribute='vulnerability/usn';")
+			err = row.Scan(&jsonValue)
+			Expect(err).To(BeNil())
+			Expect(jsonValue).To(Equal(`"USN-1111-1111"`))
+
+			row = testDB.QueryRow("SELECT json_value FROM eavt where attribute='vulnerability/cvss/base/score';")
+			err = row.Scan(&jsonValue)
+			Expect(err).To(BeNil())
+			Expect(jsonValue).To(Equal(`4.7`))
+
+			//PrintTable()
 
 		})
 
