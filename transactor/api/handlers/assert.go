@@ -19,12 +19,10 @@ func NewAssertHandler(connection *transactor.Connection) *AssertHandler {
 	}
 }
 
-type AssertEntities []transactor.AttributeValuesJson
-
 func (handler *AssertHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	defer request.Body.Close()
 
-	var entities = AssertEntities{}
+	var entity = transactor.AttributeValuesJson{}
 
 	requestBody, err := ioutil.ReadAll(request.Body)
 	if err != nil {
@@ -32,20 +30,16 @@ func (handler *AssertHandler) ServeHTTP(writer http.ResponseWriter, request *htt
 		return
 	}
 
-	json.Unmarshal(requestBody, &entities)
+	json.Unmarshal(requestBody, &entity)
 
-	result := ""
 
-	for _, entity := range entities {
-
-		entityId, err := handler.Connection.CreateEntity(entity)
-		if err != nil {
-			log.Println(err)
-			http.Error(writer, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		result = result + fmt.Sprintf("Created Entity: %d\n", entityId)
+	entityId, err := handler.Connection.CreateEntity(entity)
+	if err != nil {
+		log.Println(err)
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return
 	}
+	result := fmt.Sprintf("Created Entity: %d\n", entityId)
 
 	writer.WriteHeader(http.StatusCreated)
 	fmt.Fprint(writer, result)

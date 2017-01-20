@@ -8,8 +8,8 @@ import (
 
 func NewHandlers(connection *transactor.Connection) rata.Handlers {
 	return rata.Handlers{
-		Accumulate: handlers.NewAccumulateHandler(connection),
 		Assert: handlers.NewAssertHandler(connection),
+		Accumulate: handlers.NewAccumulateHandler(connection),
 		Docs: handlers.NewDocsHandler(),
 	}
 }
