@@ -1,4 +1,4 @@
-package handlers
+package api
 
 import (
 	"net/http"
@@ -19,7 +19,7 @@ func NewAssertHandler(connection *transactor.Connection) *AssertHandler {
 	}
 }
 
-type AssertEntities []transactor.AttributeValuesJson
+type AssertEntities []transactor.AttributeValues
 
 func (handler *AssertHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	defer request.Body.Close()

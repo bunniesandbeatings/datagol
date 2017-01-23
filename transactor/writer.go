@@ -8,11 +8,10 @@ import (
 	"strings"
 )
 
-// todo Writer
+// string
+type AttributeValues map[string]json.RawMessage
 
-type AttributeValuesJson map[string]json.RawMessage
-
-func (transactor *Connection) insert(entityID uint64, attributeValues AttributeValuesJson) error {
+func (transactor *Connection) insert(entityID uint64, attributeValues AttributeValues) error {
 	insertStatement := `INSERT INTO eavt (entity, attribute, json_value, time) VALUES`
 
 	params := []interface{}{}
@@ -53,7 +52,7 @@ func (transactor *Connection) insert(entityID uint64, attributeValues AttributeV
 	return nil
 }
 
-func (transactor *Connection) UpdateEntity(entityID uint64, attributeValues AttributeValuesJson) error {
+func (transactor *Connection) UpdateEntity(entityID uint64, attributeValues AttributeValues) error {
 	if err := transactor.insert(entityID, attributeValues); err != nil {
 		return err
 	}
@@ -61,7 +60,7 @@ func (transactor *Connection) UpdateEntity(entityID uint64, attributeValues Attr
 	return nil
 }
 
-func (transactor *Connection) CreateEntity(attributeValues AttributeValuesJson) (uint64, error) {
+func (transactor *Connection) CreateEntity(attributeValues AttributeValues) (uint64, error) {
 	var entityId uint64
 
 	if err := transactor.DB.QueryRow("select nextval('entity_sequence');").Scan(&entityId); err != nil {
