@@ -60,14 +60,14 @@ func (transactor *Connection) UpdateEntity(entityID uint64, attributeValues Enti
 	return nil
 }
 
-func (transactor *Connection) CreateEntity(attributeValues Entity) (uint64, error) {
+func (transactor *Connection) CreateEntity(entity Entity) (uint64, error) {
 	var entityId uint64
 
 	if err := transactor.DB.QueryRow("select nextval('entity_sequence');").Scan(&entityId); err != nil {
 		return 0, err
 	}
 
-	if err := transactor.insert(entityId, attributeValues); err != nil {
+	if err := transactor.insert(entityId, entity); err != nil {
 		return 0, err
 	}
 
