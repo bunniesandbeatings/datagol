@@ -12,6 +12,7 @@ import (
 	"bytes"
 	"fmt"
 	"database/sql"
+	"github.com/bunniesandbeatings/datagol/testutil"
 )
 
 var _ = Describe("Transactor", func() {
@@ -22,17 +23,18 @@ var _ = Describe("Transactor", func() {
 		port        = "3030"
 		apiEndpoint = fmt.Sprintf("http://%s:%s", host, port)
 		entitiesEndpoint = fmt.Sprintf("%s/entities", apiEndpoint)
+		testDB *testutil_test.DB
 	)
 
 	BeforeEach(func() {
-		ResetTestDB()
+		testDB = testutil_test.NewPostgres("user=datagol_test dbname=datagol_test sslmode=disable")
 
 		transactor = Command(
 			datagolCLI,
 			"start-transactor",
 			"-a", host,
 			"-p", port,
-			"-d", testDatasourceName,
+			"-d", testDB.DatasourceName,
 		)
 
 		var err error
@@ -44,9 +46,8 @@ var _ = Describe("Transactor", func() {
 	AfterEach(func() {
 		session.Interrupt()
 		Eventually(session).Should(Exit())
-		Expect(testDB).NotTo(BeNil())
-		err := testDB.Close()
-		Expect(err).NotTo(HaveOccurred())
+
+		testDB.Close()
 	})
 
 	Describe("Assert with lots of entities attributes", func() {
@@ -97,22 +98,22 @@ var _ = Describe("Transactor", func() {
 
 			//PrintTable()
 
-			row = testDB.QueryRow("SELECT count(DISTINCT time) FROM eavt;")
+			row = testDB.DB.QueryRow("SELECT count(DISTINCT time) FROM eavt;")
 			err = row.Scan(&count)
 			Expect(err).To(BeNil())
 			Expect(count).To(Equal(2))
 
-			row = testDB.QueryRow("SELECT count(DISTINCT entity) FROM eavt;")
+			row = testDB.DB.QueryRow("SELECT count(DISTINCT entity) FROM eavt;")
 			err = row.Scan(&count)
 			Expect(err).To(BeNil())
 			Expect(count).To(Equal(2))
 
-			row = testDB.QueryRow("SELECT json_value FROM eavt where attribute='vulnerability/usn';")
+			row = testDB.DB.QueryRow("SELECT json_value FROM eavt where attribute='vulnerability/usn';")
 			err = row.Scan(&jsonValue)
 			Expect(err).To(BeNil())
 			Expect(jsonValue).To(Equal(`"USN-1111-1111"`))
 
-			row = testDB.QueryRow("SELECT json_value FROM eavt where attribute='vulnerability/cvss/base/score';")
+			row = testDB.DB.QueryRow("SELECT json_value FROM eavt where attribute='vulnerability/cvss/base/score';")
 			err = row.Scan(&jsonValue)
 			Expect(err).To(BeNil())
 			Expect(jsonValue).To(Equal(`4.7`))

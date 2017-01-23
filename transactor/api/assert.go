@@ -19,7 +19,7 @@ func NewAssertHandler(connection *transactor.Connection) *AssertHandler {
 	}
 }
 
-type AssertEntities []transactor.AttributeValues
+type AssertEntities []transactor.Entity
 
 func (handler *AssertHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	defer request.Body.Close()
