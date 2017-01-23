@@ -11,19 +11,18 @@ import (
 	"net/http"
 	"bytes"
 	"fmt"
-	"database/sql"
 	"github.com/bunniesandbeatings/datagol/testutil"
 )
 
 var _ = Describe("Transactor", func() {
 	var (
-		transactor  *Cmd
-		session     *Session
-		host        = "127.0.0.1"
-		port        = "3030"
-		apiEndpoint = fmt.Sprintf("http://%s:%s", host, port)
+		transactor       *Cmd
+		session          *Session
+		host             = "127.0.0.1"
+		port             = "3030"
+		apiEndpoint      = fmt.Sprintf("http://%s:%s", host, port)
 		entitiesEndpoint = fmt.Sprintf("%s/entities", apiEndpoint)
-		testDB *testutil_test.DB
+		testDB           *testutil_test.DB
 	)
 
 	BeforeEach(func() {
@@ -89,34 +88,17 @@ var _ = Describe("Transactor", func() {
 		//})
 
 		It("creates the correct records in the DB", func() {
-			var (
-				count     int
-				row       *sql.Row
-				err       error
-				jsonValue string
-			)
+			Expect(testDB.SingleQuery("SELECT count(DISTINCT time) FROM eavt;")).
+				To(Equal(int64(2)))
 
-			//PrintTable()
+			Expect(testDB.SingleQuery("SELECT count(DISTINCT entity) FROM eavt;")).
+				To(Equal(int64(2)))
 
-			row = testDB.DB.QueryRow("SELECT count(DISTINCT time) FROM eavt;")
-			err = row.Scan(&count)
-			Expect(err).To(BeNil())
-			Expect(count).To(Equal(2))
+			Expect(testDB.SingleQuery("SELECT json_value FROM eavt where attribute='vulnerability/usn';")).
+				To(Equal(`"USN-1111-1111"`))
 
-			row = testDB.DB.QueryRow("SELECT count(DISTINCT entity) FROM eavt;")
-			err = row.Scan(&count)
-			Expect(err).To(BeNil())
-			Expect(count).To(Equal(2))
-
-			row = testDB.DB.QueryRow("SELECT json_value FROM eavt where attribute='vulnerability/usn';")
-			err = row.Scan(&jsonValue)
-			Expect(err).To(BeNil())
-			Expect(jsonValue).To(Equal(`"USN-1111-1111"`))
-
-			row = testDB.DB.QueryRow("SELECT json_value FROM eavt where attribute='vulnerability/cvss/base/score';")
-			err = row.Scan(&jsonValue)
-			Expect(err).To(BeNil())
-			Expect(jsonValue).To(Equal(`4.7`))
+			Expect(testDB.SingleQuery("SELECT json_value FROM eavt where attribute='vulnerability/cvss/base/score';")).
+				To(Equal(`4.7`))
 		})
 	})
 

@@ -78,3 +78,13 @@ func (db *DB) PrintTable() {
 		fmt.Println(row.String())
 	}
 }
+
+func (db *DB) SingleQuery(query string) interface{}  {
+	var result interface{}
+	err := db.DB.QueryRow(query).Scan(&result)
+	if err != nil {
+		Fail(fmt.Sprintf("SingleQuery '%s' failed with '%s'", query, err))
+	}
+
+	return result
+}
