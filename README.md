@@ -26,7 +26,7 @@ And in another
 ## Todo
 
 * Accumulate support in API
-* Ensure only one Connection running
+* Ensure only one Backend running
 * Broadcast updates
 
 ## Could do

@@ -6,11 +6,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type Connection struct {
+type Backend struct {
 	DB *sql.DB
 }
 
-func NewConnection(dataSourceName string) (*Connection, error) {
+func NewBackend(dataSourceName string) (*Backend, error) {
 	db, err := sql.Open("postgres", dataSourceName)
 	if err != nil {
 		return nil, err
@@ -24,7 +24,11 @@ func NewConnection(dataSourceName string) (*Connection, error) {
 		return nil, err
 	}
 
-	return &Connection{DB: db}, nil
+	return &Backend{DB: db}, nil
+}
+
+func(backend *Backend) Shutdown() {
+	backend.DB.Close()
 }
 
 func ensureSchema(db *sql.DB) error {
@@ -33,7 +37,7 @@ func ensureSchema(db *sql.DB) error {
 		  CREATE TABLE IF NOT EXISTS eavt (
 		    entity bigint NOT NULL,
 		    attribute text NOT NULL,
-		    json_value text NOT NULL,
+		    value text NOT NULL,
 		  	time timestamp NOT NULL
 		  );
 		  CREATE SEQUENCE IF NOT EXISTS entity_sequence;

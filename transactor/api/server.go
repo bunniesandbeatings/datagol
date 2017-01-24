@@ -13,7 +13,7 @@ type ServerConfig struct {
 	Address string
 }
 
-func (serverConfig *ServerConfig) Start(engine *transactor.Connection) error {
+func (serverConfig *ServerConfig) Start(engine *transactor.Backend) error {
 	router, err := rata.NewRouter(Routes, NewHandlers(engine))
 	if err != nil {
 		return err

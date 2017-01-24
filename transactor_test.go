@@ -26,14 +26,14 @@ var _ = Describe("Transactor", func() {
 	)
 
 	BeforeEach(func() {
-		testDB = testutil_test.NewPostgres("user=datagol_test dbname=datagol_test sslmode=disable")
+		testDB = testutil_test.NewPostgres()
 
 		transactor = Command(
 			datagolCLI,
 			"start-transactor",
 			"-a", host,
 			"-p", port,
-			"-d", testDB.DatasourceName,
+			"-d", "user=datagol_test dbname=datagol_test sslmode=disable",
 		)
 
 		var err error
@@ -78,7 +78,7 @@ var _ = Describe("Transactor", func() {
 		//	Expect(err).To(BeNil())
 		//
 		//	var jsonResponse = []struct{
-		//		Entity string `json:"entity"`
+		//		StringEntity string `json:"entity"`
 		//	}{}
 		//
 		//	json.Unmarshal(byteResponse, jsonResponse)

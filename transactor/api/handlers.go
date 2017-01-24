@@ -5,7 +5,7 @@ import 	(
 	"github.com/bunniesandbeatings/datagol/transactor"
 )
 
-func NewHandlers(connection *transactor.Connection) rata.Handlers {
+func NewHandlers(connection *transactor.Backend) rata.Handlers {
 	return rata.Handlers{
 		Assert: NewAssertHandler(connection),
 	}

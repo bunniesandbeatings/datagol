@@ -28,7 +28,7 @@ func (transactorOptions *TransactorOptions) Execute(args []string) error {
 
 	ConfigureLogging()
 
-	connection, err := transactor.NewConnection(transactorOptions.DB.DBConnectString)
+	connection, err := transactor.NewBackend(transactorOptions.DB.DBConnectString)
 	if err != nil {
 		return err
 	}

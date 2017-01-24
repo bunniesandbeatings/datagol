@@ -10,16 +10,16 @@ import (
 )
 
 type AssertHandler struct {
-	Connection *transactor.Connection
+	Connection *transactor.Backend
 }
 
-func NewAssertHandler(connection *transactor.Connection) *AssertHandler {
+func NewAssertHandler(connection *transactor.Backend) *AssertHandler {
 	return &AssertHandler{
 		Connection: connection,
 	}
 }
 
-type AssertEntities []transactor.Entity
+type AssertEntities []*transactor.StringEntity
 
 func (handler *AssertHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	defer request.Body.Close()
@@ -38,13 +38,13 @@ func (handler *AssertHandler) ServeHTTP(writer http.ResponseWriter, request *htt
 
 	for _, entity := range entities {
 
-		entityId, err := handler.Connection.CreateEntity(entity)
+		entityId, err := handler.Connection.Commit(entity)
 		if err != nil {
 			log.Println(err)
 			http.Error(writer, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		result = result + fmt.Sprintf("Created Entity: %d\n", entityId)
+		result = result + fmt.Sprintf("Created StringEntity: %d\n", entityId)
 	}
 
 	writer.WriteHeader(http.StatusCreated)
