@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"fmt"
+	"github.com/bunniesandbeatings/datagol/attributes"
 )
 
 type AssertHandler struct {
@@ -19,7 +20,7 @@ func NewAssertHandler(connection *transactor.Backend) *AssertHandler {
 	}
 }
 
-type AssertEntities []*transactor.StringEntity
+type AssertEntities []transactor.StringEntity
 
 func (handler *AssertHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	defer request.Body.Close()
@@ -38,13 +39,13 @@ func (handler *AssertHandler) ServeHTTP(writer http.ResponseWriter, request *htt
 
 	for _, entity := range entities {
 
-		entityId, err := handler.Connection.Commit(entity)
+		newEntity, err := handler.Connection.Commit(entity)
 		if err != nil {
 			log.Println(err)
 			http.Error(writer, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		result = result + fmt.Sprintf("Created StringEntity: %d\n", entityId)
+		result = result + fmt.Sprintf("Created StringEntity: %d\n", newEntity[attributes.IDENT])
 	}
 
 	writer.WriteHeader(http.StatusCreated)
